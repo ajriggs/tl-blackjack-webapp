@@ -1,16 +1,17 @@
 <%= @result %>
 
-<div>
-  <% unless player_turn_over? %>
-    <h3 id-'player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
+
+<% unless player_turn_over? %>
+  <div>
+    <h3 id='player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
     <form class='player_action' action='/game/hit_player' method='post'>
       <button class='btn btn-danger' type='submit'>Hit</button>
     </form>
     <form class='player_action' action='/stay' method='post'>
       <button class='btn btn-inverse' type='submit'>Stay</button>
     </form>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
 <div class='span12 spacer'></div>
 
@@ -30,9 +31,12 @@
     <%= image %>
   <% end %>
   <% if @hit_dealer_button %>
-    <form id='hit_dealer' action='/game/hit_dealer' method='post'>
-      <button class='btn btn-inverse'>Dealer Must Hit</button>
-    </form>
+    <div>
+      <h4 class='inline_header'>Dealer Must Hit</h4>
+      <form id='hit_dealer' action='/game/hit_dealer' method='post'>
+        <button class='btn btn-inverse'>Reveal Next Card</button>
+      </form>
+    <div>
   <% end %>
   <% if dealer_plays? %>
     <h4 class='table_header'>Total: <%= hand_total(session[:dealer_hand]).to_s %></h4>
