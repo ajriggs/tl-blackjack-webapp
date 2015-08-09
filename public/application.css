@@ -1,0 +1,8 @@
+div.table {background-color: #31B148;
+ border: 4px solid black;
+ border-radius: 8px;
+ }
+
+div.spacer {
+  height: 25px;
+}

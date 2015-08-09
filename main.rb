@@ -86,14 +86,14 @@ helpers do
   def results_alert
     alert_type = player_wins? ? '-success' : dealer_wins? ? '-error' : ''
     if player_has_money?
-      "<div class='alert alert#{alert_type}'>
+      "<div class='alert span12 alert#{alert_type}'>
         <h3>#{results_string}</h3>
         <a href='/start_new_round'>
           <button class='btn btn-danger'>Let's keep going!</button>
         </a>
       </div>"
     else
-      "<div class='alert alert#{alert_type}'>
+      "<div class='alert span12 alert#{alert_type}'>
         <h3>#{results_string}</h3>
       </div>"
     end
