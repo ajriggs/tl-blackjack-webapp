@@ -35,7 +35,7 @@ helpers do
   def card_image_string(card)
     suit = card[:suit].downcase
     id = card_image_id(card)
-    "<img src='/images/cards/#{suit}_#{id}.jpg' style='margin: 15px 15px 15px 15px; border: 3px solid black; border-radius: 5px'/>"
+    "<img src='/images/cards/#{suit}_#{id}.jpg' class='card'/>"
   end
 
   def welcome_button
@@ -213,10 +213,6 @@ get '/' do
 end
 
 get '/welcome' do
-  if session[:invalid_input]
-    @error = VALIDATION_STRING
-    session[:invalid_input] = false
-  end
   session.clear
   erb :welcome
 end
@@ -229,7 +225,8 @@ end
 get '/start_new_game' do
   if [nil, '', ' '].include?(session[:player_name])
     session[:invalid_input] = true
-    redirect '/welcome'
+    @error = VALIDATION_STRING
+    halt erb :welcome
   end
   session[:deck] = initialize_deck
   session[:deck].shuffle!
@@ -255,18 +252,14 @@ get '/start_new_round' do
 end
 
 get '/place_bet' do
-  if session[:invalid_input]
-    @error = VALIDATION_STRING
-    session[:invalid_input] = false
-  end
   erb :place_bet
 end
 
 post '/place_bet' do
   session[:player_bet] = params[:player_bet].to_i
   unless session[:player_bet].between?(1, session[:player_money])
-    session[:invalid_input] = true
-    redirect '/place_bet'
+    @error = VALIDATION_STRING
+    halt erb :place_bet
   end
   redirect '/game'
 end

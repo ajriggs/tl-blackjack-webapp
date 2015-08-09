@@ -2,11 +2,11 @@
 
 <div>
   <% unless player_turn_over? %>
-    <h3 style='display: inline; margin: 25px 25px 25px 25px'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
-    <form style='display: inline' action='/hit_player' method='post'>
+    <h3 id-'player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
+    <form class='player_action' action='/hit_player' method='post'>
       <button class='btn btn-danger' type='submit'>Hit</button>
     </form>
-    <form style='display: inline' action='/stay' method='post'>
+    <form class='player_action' action='/stay' method='post'>
       <button class='btn btn-inverse' type='submit'>Stay</button>
     </form>
   <% end %>
@@ -15,31 +15,31 @@
 <div class='span12 spacer'></div>
 
 <div class='span12 table'>
-  <h3 style='text-align: center'>Your hand</h3>
+  <h3 class='table_header'>Your hand</h3>
   <% @player_hand_images.each do |image| %>
     <%= image %>
   <% end %>
-  <h4 style='text-align: center'>Total: <%= hand_total(session[:player_hand]).to_s %></h4>
+  <h4 class='table_header'>Total: <%= hand_total(session[:player_hand]).to_s %></h4>
 </div>
 
 <div class='span12 spacer'></div>
 
 <div class='span12 table'>
-  <h3 style='text-align: center'>Dealer's Hand</h3>
+  <h3 class='table_header'>Dealer's Hand</h3>
   <% if @dealer_hand_images.is_a?(Array) %>
     <% @dealer_hand_images.each do |image| %>
       <%= image %>
     <% end %>
   <% else %>
     <%= @dealer_first_card %>
-    <img src='/images/cards/cover.jpg' style='margin: 15px 15px 15px 15px; border: 3px solid black; border-radius: 5px'/>
+    <img src='/images/cards/cover.jpg' class='card'/>
   <% end %>
   <% if @hit_dealer_button %>
-    <form style='margin: 15px' action='/hit_dealer' method='post'>
+    <form id='hit_dealer' action='/hit_dealer' method='post'>
       <button class='btn btn-inverse'>Dealer Must Hit</button>
     </form>
   <% end %>
   <% if dealer_plays? %>
-    <h4 style='text-align: center'>Total: <%= hand_total(session[:dealer_hand]).to_s %></h4>
+    <h4 class='table_header'>Total: <%= hand_total(session[:dealer_hand]).to_s %></h4>
   <% end %>
 </div>
