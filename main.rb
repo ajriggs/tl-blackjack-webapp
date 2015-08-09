@@ -150,6 +150,32 @@ helpers do
     hand_total(hand) > BLACKJACK
   end
 
+  def hit(player)
+    player_hand << session[:deck].shift if player == 'player'
+    dealer_hand << session[:deck].shift if player == 'dealer'
+  end
+
+  def player_turn_over?
+    session[:stay] || blackjack?(player_hand) || bust?(player_hand)
+  end
+
+  def dealer_plays?
+    player_turn_over? && !first_turn_blackjack? && !bust?(player_hand)
+  end
+
+  def dealer_turn_over?
+    return true unless dealer_plays?
+    hand_total(dealer_hand) >= DEALER_MIN
+  end
+
+  def dealer_hits?
+    dealer_plays? && !dealer_turn_over?
+  end
+
+  def round_over?
+    player_turn_over? && dealer_turn_over?
+  end
+
   def winner
     if first_turn_blackjack? || (!bust?(player_hand) && hand_total(player_hand) > hand_total(dealer_hand)) || (!bust?(player_hand) && bust?(dealer_hand))
         "player"
@@ -166,32 +192,6 @@ helpers do
 
   def dealer_wins?
     winner == 'dealer'
-  end
-
-  def player_turn_over?
-    session[:stay] || blackjack?(player_hand) || bust?(player_hand)
-  end
-
-  def hit(player)
-    player_hand << session[:deck].shift if player == 'player'
-    dealer_hand << session[:deck].shift if player == 'dealer'
-  end
-
-  def dealer_plays?
-    player_turn_over? && !first_turn_blackjack? && !bust?(player_hand)
-  end
-
-  def dealer_hits?
-    dealer_plays? && !dealer_turn_over?
-  end
-
-  def dealer_turn_over?
-    return true unless dealer_plays?
-    hand_total(dealer_hand) >= DEALER_MIN
-  end
-
-  def round_over?
-    player_turn_over? && dealer_turn_over?
   end
 
   def discard_hands
