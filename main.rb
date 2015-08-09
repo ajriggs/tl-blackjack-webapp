@@ -177,20 +177,21 @@ helpers do
     dealer_hand << session[:deck].shift if player == 'dealer'
   end
 
-  def dealer_hits?
-    player_turn_over? && !first_turn_blackjack? && !bust?(player_hand) && !dealer_turn_over?
+  def dealer_plays?
+    player_turn_over? && !first_turn_blackjack? && !bust?(player_hand)
   end
 
-  def dealer_plays?
-    player_turn_over? && !bust?(player_hand)
+  def dealer_hits?
+    dealer_plays? && !dealer_turn_over?
   end
 
   def dealer_turn_over?
+    return true unless dealer_plays?
     hand_total(dealer_hand) >= DEALER_MIN
   end
 
   def round_over?
-    (player_turn_over? && dealer_turn_over?) || bust?(player_hand) || first_turn_blackjack?
+    player_turn_over? && dealer_turn_over?
   end
 
   def discard_hands
