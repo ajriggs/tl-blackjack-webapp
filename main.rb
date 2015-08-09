@@ -59,7 +59,7 @@ helpers do
   def results_string
     string = ''
     if player_wins?
-      string = "#{session[:player_name]} wins!"
+      string = "You win!"
       if blackjack?(player_hand)
         string.prepend("Blackjack! ")
       elsif bust?(dealer_hand)
@@ -152,7 +152,7 @@ helpers do
 
   def winner
     if first_turn_blackjack? || (!bust?(player_hand) && hand_total(player_hand) > hand_total(dealer_hand)) || (!bust?(player_hand) && bust?(dealer_hand))
-        "#{session[:player_name]}"
+        "player"
     elsif (hand_total(player_hand) == hand_total(dealer_hand))
       'tie'
     else
@@ -161,7 +161,7 @@ helpers do
   end
 
   def player_wins?
-    winner == "#{session[:player_name]}"
+    winner == "player"
   end
 
   def dealer_wins?
@@ -233,7 +233,7 @@ get '/start_new_game' do
   session[:discard_pile] = []
   session[:player_hand] = []
   session[:dealer_hand] = []
-  session[:player_money] = 100
+  session[:player_money] = 500
   redirect '/start_new_round'
 end
 
@@ -264,16 +264,6 @@ post '/place_bet' do
   redirect '/game'
 end
 
-post '/hit_player' do
-  hit('player')
-  redirect '/game'
-end
-
-post '/hit_dealer' do
-  hit('dealer')
-  redirect '/game'
-end
-
 post '/stay' do
   session[:stay] = true
   redirect '/game'
@@ -295,11 +285,21 @@ get '/game' do
       images << card_image_string(card)
     end
   else
-    @dealer_first_card = card_image_string(dealer_hand[0])
+    @dealer_hand_images = [card_image_string(dealer_hand[0]), "<img src='/images/cards/cover.jpg' class='card'/>"]
   end
   @hit_dealer_button = true if dealer_hits?
   @result = results_alert if round_over?
   erb :game
+end
+
+post '/game/hit_player' do
+  hit('player')
+  redirect '/game'
+end
+
+post '/game/hit_dealer' do
+  hit('dealer')
+  redirect '/game'
 end
 
 get '/help' do

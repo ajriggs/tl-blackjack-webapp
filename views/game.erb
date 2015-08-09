@@ -3,7 +3,7 @@
 <div>
   <% unless player_turn_over? %>
     <h3 id-'player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
-    <form class='player_action' action='/hit_player' method='post'>
+    <form class='player_action' action='/game/hit_player' method='post'>
       <button class='btn btn-danger' type='submit'>Hit</button>
     </form>
     <form class='player_action' action='/stay' method='post'>
@@ -26,16 +26,11 @@
 
 <div class='span12 table'>
   <h3 class='table_header'>Dealer's Hand</h3>
-  <% if @dealer_hand_images.is_a?(Array) %>
-    <% @dealer_hand_images.each do |image| %>
-      <%= image %>
-    <% end %>
-  <% else %>
-    <%= @dealer_first_card %>
-    <img src='/images/cards/cover.jpg' class='card'/>
+  <% @dealer_hand_images.each do |image| %>
+    <%= image %>
   <% end %>
   <% if @hit_dealer_button %>
-    <form id='hit_dealer' action='/hit_dealer' method='post'>
+    <form id='hit_dealer' action='/game/hit_dealer' method='post'>
       <button class='btn btn-inverse'>Dealer Must Hit</button>
     </form>
   <% end %>
