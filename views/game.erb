@@ -1,6 +1,5 @@
 <%= @result %>
 
-
 <% unless player_turn_over? %>
   <div>
     <h3 id='player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>

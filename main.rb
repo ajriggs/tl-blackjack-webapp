@@ -75,7 +75,7 @@ helpers do
     if player_wins?
       string = "You win!"
       if blackjack?(player_hand)
-        string.prepend("you got blackjack! ")
+        string.prepend("You got blackjack! ")
       elsif bust?(dealer_hand)
         string.prepend("The dealer bust! ")
       else
@@ -287,11 +287,6 @@ post '/place_bet' do
   redirect '/game'
 end
 
-post '/stay' do
-  session[:stay] = true
-  redirect '/game'
-end
-
 get '/game' do
   if round_over? && player_wins? && !session[:player_settled]
    session[:player_money] += session[:player_bet]
@@ -305,6 +300,11 @@ get '/game' do
   @hit_dealer_button = true if dealer_hits?
   @result = results_alert if round_over?
   erb :game
+end
+
+post '/stay' do
+  session[:stay] = true
+  redirect '/game'
 end
 
 post '/game/hit_player' do
