@@ -16,6 +16,7 @@ div.spacer {
 }
 
 form.player_action {
+  margin-left: 10px;
   display: inline;
 }
 
@@ -58,6 +59,10 @@ div#front_page {
 h1#title {
   color: #FF0000;
   text-shadow: -2px 0 black, 0 1px black, 3px 0 black, 0 -4px black;
+}
+
+h3#results_string {
+  display: inline;
 }
 
 p#welcome_text {

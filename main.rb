@@ -38,6 +38,20 @@ helpers do
     "<img src='/images/cards/#{suit}_#{id}.jpg' class='card'/>"
   end
 
+  def card_images(hand)
+    if hand == player_hand
+      @player_hand_images = player_hand.each_with_object([]) do |card, images|
+        images << card_image_string(card)
+      end
+    elsif dealer_plays?
+      @dealer_hand_images = dealer_hand.each_with_object([]) do |card, images|
+        images << card_image_string(card)
+      end
+    else
+      @dealer_hand_images = [card_image_string(dealer_hand[0]), "<img src='/images/cards/cover.jpg' class='card'/>"]
+    end
+  end
+
   def welcome_button
     "<form action='/welcome'>
       <button class='btn btn-danger'>Start A New Game!</button>
@@ -61,9 +75,11 @@ helpers do
     if player_wins?
       string = "You win!"
       if blackjack?(player_hand)
-        string.prepend("Blackjack! ")
+        string.prepend("you got blackjack! ")
       elsif bust?(dealer_hand)
         string.prepend("The dealer bust! ")
+      else
+        string.prepend("The dealer stayed at #{hand_total(dealer_hand)} and you stayed at #{hand_total(player_hand)}. ")
       end
     elsif dealer_wins?
       string = "You lose!"
@@ -71,14 +87,20 @@ helpers do
         string.prepend("You busted! ")
       elsif blackjack?(dealer_hand)
         string.prepend("The dealer got blackjack. ")
+      else
+        string.prepend("The dealer stayed at #{hand_total(dealer_hand)} and you stayed at #{hand_total(player_hand)}. ")
       end
     else
       string = "It's a tie!"
     end
+    string
+  end
+
+  def play_again!(string)
     if player_has_money?
       string += " You've amassed $#{session[:player_money]}. Do you want to start another round? "
     else
-      string += "\n Looks like you've run out of money. Start a new game, if you like."
+      string += " Looks like you've run out of money. Start a new game, if you like."
     end
     string
   end
@@ -87,14 +109,14 @@ helpers do
     alert_type = player_wins? ? '-success' : dealer_wins? ? '-error' : ''
     if player_has_money?
       "<div class='alert span12 alert#{alert_type}'>
-        <h3>#{results_string}</h3>
-        <a href='/start_new_round'>
+        <h3 id='results_string'>#{play_again!(results_string)}</h3>
+        <form class='player_action' action='/start_new_round'>
           <button class='btn btn-danger'>Let's keep going!</button>
-        </a>
+        </form>
       </div>"
     else
       "<div class='alert span12 alert#{alert_type}'>
-        <h3>#{results_string}</h3>
+        <h3>#{play_again!(results_string)}</h3>
       </div>"
     end
   end
@@ -274,20 +296,12 @@ get '/game' do
   if round_over? && player_wins? && !session[:player_settled]
    session[:player_money] += session[:player_bet]
    session[:player_settled] = true
- elsif round_over? && dealer_wins? && !session[:player_settled]
+  elsif round_over? && dealer_wins? && !session[:player_settled]
    session[:player_money] -= session[:player_bet]
    session[:player_settled] = true
- end
-  @player_hand_images = player_hand.each_with_object([]) do |card, images|
-    images << card_image_string(card)
   end
-  if dealer_plays?
-    @dealer_hand_images = dealer_hand.each_with_object([]) do |card, images|
-      images << card_image_string(card)
-    end
-  else
-    @dealer_hand_images = [card_image_string(dealer_hand[0]), "<img src='/images/cards/cover.jpg' class='card'/>"]
-  end
+  card_images(player_hand)
+  card_images(dealer_hand)
   @hit_dealer_button = true if dealer_hits?
   @result = results_alert if round_over?
   erb :game
