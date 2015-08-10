@@ -1,43 +1,45 @@
-<%= @result %>
+<div id='game'>
+  <%= @result %>
 
-<% unless player_turn_over? %>
-  <div>
-    <h3 id='player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
-    <form class='player_action' action='/game/hit_player' method='post'>
-      <button class='btn btn-danger' type='submit'>Hit</button>
-    </form>
-    <form class='player_action' action='/stay' method='post'>
-      <button class='btn btn-inverse' type='submit'>Stay</button>
-    </form>
-  </div>
-<% end %>
-
-<div class='span12 spacer'></div>
-
-<div class='span12 table'>
-  <h3 class='table_header'>Your hand</h3>
-  <% @player_hand_images.each do |image| %>
-    <%= image %>
-  <% end %>
-  <h4 class='table_header'>Total: <%= hand_total(session[:player_hand]).to_s %></h4>
-</div>
-
-<div class='span12 spacer'></div>
-
-<div class='span12 table'>
-  <h3 class='table_header'>Dealer's Hand</h3>
-  <% @dealer_hand_images.each do |image| %>
-    <%= image %>
-  <% end %>
-  <% if @hit_dealer_button %>
+  <% unless player_turn_over? %>
     <div>
-      <h4 class='inline_header'>Dealer Must Hit</h4>
-      <form id='hit_dealer' action='/game/hit_dealer' method='post'>
-        <button class='btn btn-inverse'>Reveal Next Card</button>
+      <h3 id='player_info'>You've bet $<%= session[:player_bet]%> out of $<%= session[:player_money] %>. What would you like to do?</h3>
+      <form id='hit' class='player_action' action='/game/hit_player' method='post'>
+        <button  class='btn btn-danger' type='submit'>Hit</button>
       </form>
-    <div>
+      <form id='stay' class='player_action' action='/game/stay' method='post'>
+        <button class='btn btn-inverse' type='submit'>Stay</button>
+      </form>
+    </div>
   <% end %>
-  <% if dealer_plays? %>
-    <h4 class='table_header'>Total: <%= hand_total(session[:dealer_hand]).to_s %></h4>
-  <% end %>
-</div>
+
+  <div class='span12 spacer'></div>
+
+  <div class='span12 table'>
+    <h3 class='table_header'>Your hand</h3>
+    <% @player_hand_images.each do |image| %>
+      <%= image %>
+    <% end %>
+    <h4 class='table_header'>Total: <%= hand_total(session[:player_hand]).to_s %></h4>
+  </div>
+
+  <div class='span12 spacer'></div>
+
+  <div class='span12 table'>
+    <h3 class='table_header'>Dealer's Hand</h3>
+    <% @dealer_hand_images.each do |image| %>
+      <%= image %>
+    <% end %>
+    <% if @hit_dealer_button %>
+      <div>
+        <h4 class='inline_header'>Dealer Must Hit</h4>
+        <form id='hit_dealer' action='/game/hit_dealer' method='post'>
+          <button class='btn btn-inverse'>Reveal Next Card</button>
+        </form>
+      <div>
+    <% end %>
+    <% if dealer_plays? %>
+      <h4 class='table_header'>Total: <%= hand_total(session[:dealer_hand]).to_s %></h4>
+    <% end %>
+  </div>
+<div>

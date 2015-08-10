@@ -40,13 +40,9 @@ helpers do
 
   def card_images(hand)
     if hand == player_hand
-      @player_hand_images = player_hand.each_with_object([]) do |card, images|
-        images << card_image_string(card)
-      end
+      @player_hand_images = player_hand.map { |card| card_image_string (card) }
     elsif dealer_plays?
-      @dealer_hand_images = dealer_hand.each_with_object([]) do |card, images|
-        images << card_image_string(card)
-      end
+      @dealer_hand_images = dealer_hand.map { |card| card_image_string(card) }
     else
       @dealer_hand_images = [card_image_string(dealer_hand[0]), "<img src='/images/cards/cover.jpg' class='card'/>"]
     end
@@ -106,7 +102,9 @@ helpers do
   end
 
   def results_alert
-    alert_type = player_wins? ? '-success' : dealer_wins? ? '-error' : ''
+    alert_type = ''
+    alert_type = '-success' if player_wins?
+    alert_type = '-error' if dealer_wins?
     if player_has_money?
       "<div class='alert span12 alert#{alert_type}'>
         <h3 id='results_string'>#{play_again!(results_string)}</h3>
@@ -172,9 +170,8 @@ helpers do
     hand_total(hand) > BLACKJACK
   end
 
-  def hit(player)
-    player_hand << session[:deck].shift if player == 'player'
-    dealer_hand << session[:deck].shift if player == 'dealer'
+  def hit(hand)
+    hand << session[:deck].shift
   end
 
   def player_turn_over?
@@ -199,8 +196,9 @@ helpers do
   end
 
   def winner
-    if first_turn_blackjack? || (!bust?(player_hand) && hand_total(player_hand) > hand_total(dealer_hand)) || (!bust?(player_hand) && bust?(dealer_hand))
-        "player"
+    if first_turn_blackjack? || (!bust?(player_hand) &&
+          hand_total(player_hand) > hand_total(dealer_hand)) ||  (!bust?(player_hand) && bust?(dealer_hand))
+      "player"
     elsif (hand_total(player_hand) == hand_total(dealer_hand))
       'tie'
     else
@@ -227,6 +225,20 @@ helpers do
   def replenish_deck
     session[:deck] += session[:discard_pile]
     session[:discard_pile].clear
+  end
+
+  def fetch_and_update_game_state
+    if round_over? && player_wins? && !session[:player_settled]
+     session[:player_money] += session[:player_bet]
+     session[:player_settled] = true
+    elsif round_over? && dealer_wins? && !session[:player_settled]
+     session[:player_money] -= session[:player_bet]
+     session[:player_settled] = true
+    end
+    card_images(player_hand)
+    card_images(dealer_hand)
+    @hit_dealer_button = true if dealer_hits?
+    @result = results_alert if round_over?
   end
 
 end
@@ -268,8 +280,8 @@ get '/start_new_round' do
   session[:player_settled] = false
   session[:stay] = false
   2.times do
-    hit('player')
-    hit('dealer')
+    hit(player_hand)
+    hit(dealer_hand)
   end
   redirect '/place_bet'
 end
@@ -288,33 +300,26 @@ post '/place_bet' do
 end
 
 get '/game' do
-  if round_over? && player_wins? && !session[:player_settled]
-   session[:player_money] += session[:player_bet]
-   session[:player_settled] = true
-  elsif round_over? && dealer_wins? && !session[:player_settled]
-   session[:player_money] -= session[:player_bet]
-   session[:player_settled] = true
-  end
-  card_images(player_hand)
-  card_images(dealer_hand)
-  @hit_dealer_button = true if dealer_hits?
-  @result = results_alert if round_over?
+  fetch_and_update_game_state
   erb :game
 end
 
-post '/stay' do
+post '/game/stay' do
   session[:stay] = true
-  redirect '/game'
+  fetch_and_update_game_state
+  erb :game, layout: false
 end
 
 post '/game/hit_player' do
-  hit('player')
-  redirect '/game'
+  hit(player_hand)
+  fetch_and_update_game_state
+  erb :game, layout: false
 end
 
 post '/game/hit_dealer' do
-  hit('dealer')
-  redirect '/game'
+  hit(dealer_hand)
+  fetch_and_update_game_state
+  erb :game, layout: false
 end
 
 get '/help' do
